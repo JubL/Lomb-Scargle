@@ -22,6 +22,7 @@ import os
 
 import matplotlib.pyplot as plt
 import numpy as np
+import subprocess
 import colorama
 
 def read_file(cwd: str, filename: str) -> tuple[np.ndarray, np.ndarray]:
@@ -117,7 +118,8 @@ def main() -> None:
     colorama.init(autoreset=True)
     red = colorama.Fore.RED + colorama.Style.BRIGHT
 
-    cwd = '/home/jlirawi/Downloads/rust/Lomb-Scargle'
+    cmd = 'pwd'
+    cwd = subprocess.run(cmd, shell=True, encoding='utf-8', stdout=subprocess.PIPE, check=True).stdout.strip()
 
     # Load data from 'data.temp' and 'data.spec' files
     try:
