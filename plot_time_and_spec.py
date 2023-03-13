@@ -18,11 +18,11 @@ Example:
         lomb_scargle_periodogram.main()
 """
 
+import subprocess
 import os
 
 import matplotlib.pyplot as plt
 import numpy as np
-import subprocess
 import colorama
 
 def read_file(cwd: str, filename: str) -> tuple[np.ndarray, np.ndarray]:
