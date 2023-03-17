@@ -4,6 +4,8 @@ use std::io::Write;
 /// and produces the Lomb-Scargle periodogram. The behaviour
 /// is linear in ofac and hifac and quadratic in N O(ofac * hifac * N^2)
 
+// TODO: in lomb_specturm(): use arrays instead of vectors for freq and spec?
+
 
 const N: usize = 100;  // number of data points
 const T_MAX: f64 = 100.;  // recorded seconds

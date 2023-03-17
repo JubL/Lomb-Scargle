@@ -21,6 +21,7 @@ main() -> None:
 
 # TODO: Test the behaviour with non-equidistant data that have completely different sampling frequencys.
 #   How does the maximum frequency behave? Does it go up, if we have a sampling set with much higher sampling frequency?
+# TODO: How is the behaviour, if we had equidistant data? Does the Nyquist criteria come into play again?
 
 import subprocess
 import os
