@@ -5,7 +5,9 @@ use std::io::Write;
 /// is linear in ofac and hifac and quadratic in N O(ofac * hifac * N^2)
 
 // TODO: in lomb_specturm(): use arrays instead of vectors for freq and spec?
-
+// TODO: use linecount::count_lines; for fast line counting
+// also: let lines: usize = count_lines(std::fs::File.open("foo.txt").unwrap()).unwrap()
+// see https://docs.rs/linecount/latest/linecount/fn.count_lines.html
 
 const N: usize = 100;  // number of data points
 const T_MAX: f64 = 100.;  // recorded seconds
@@ -82,7 +84,7 @@ fn random_times() -> [f64; N] {
 fn syntetic_signal(mut payload: [f64; N]) -> [f64; N] {
   for item in payload.iter_mut().take(N) {
       *item *= FREQUENCY;
-      *item = 1.0 * f64::sin(*item);  //+ 0.66 * f64::sin(0.8 * *item);
+      *item = 1.0 * f64::sin(*item); // + 0.85 * f64::sin(0.8 * *item); // + (2. * rand::random::<f64>() - 1.);
   }
   payload
 }
