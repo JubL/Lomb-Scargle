@@ -23,155 +23,155 @@ main() -> None:
 #   How does the maximum frequency behave? Does it go up, if we have a sampling set with much higher sampling frequency?
 # TODO: How is the behaviour, if we had equidistant data? Does the Nyquist criteria come into play again?
 
+import matplotlib.pyplot as plt
 import subprocess
+import numpy as np
 import os
 
-import matplotlib.pyplot as plt
-import numpy as np
 import colorama
 
 
 def read_file(cwd: str, filename: str) -> tuple[np.ndarray, np.ndarray]:
-  """
-  Read a CSV file and return it's numerical content.
+    """
+    Read a CSV file and return it's numerical content.
 
-  This function expects a CSV file with a header row and two columns of numerical data separated by semicolons,
-  located in the current working directory specified by `cwd` and `filename`. The first row is ignored as it is
-  assumed to contain column labels or comments. The rest of the file is expected to contain numerical data.
-  If the data in the file cannot be loaded or is not in the expected format, a `ValueError` will be raised.
-  Otherwisea tuple containing two NumPy arrays with the data is returned.
+    This function expects a CSV file with a header row and two columns of numerical data separated by semicolons,
+    located in the current working directory specified by `cwd` and `filename`. The first row is ignored as it is
+    assumed to contain column labels or comments. The rest of the file is expected to contain numerical data.
+    If the data in the file cannot be loaded or is not in the expected format, a `ValueError` will be raised.
+    Otherwisea tuple containing two NumPy arrays with the data is returned.
 
-  Parameters
-  ----------
-  cwd : str
-    The current working directory where the CSV file is located.
-  filename : str
-    The name of the CSV file to be read.
+    Parameters
+    ----------
+    cwd : str
+      The current working directory where the CSV file is located.
+    filename : str
+      The name of the CSV file to be read.
 
-  Returns
-  -------
-  Tuple[np.ndarray, np.ndarray]
-    A tuple containing two 1D arrays, the first representing the values in the first column of the CSV file
-        and the second representing the values in the second column.
+    Returns
+    -------
+    Tuple[np.ndarray, np.ndarray]
+      A tuple containing two 1D arrays, the first representing the values in the first column of the CSV file
+          and the second representing the values in the second column.
 
-  Raises
-  ------
-  FileNotFoundError
-    If the specified directory or file does not exist.
-  ValueError
-    If the number of entries in the columns of the file do not match.
-  """
-  if not os.path.isdir(cwd):
-    raise FileNotFoundError(f"The specified directory '{cwd}' does not exist.")
+    Raises
+    ------
+    FileNotFoundError
+      If the specified directory or file does not exist.
+    ValueError
+      If the number of entries in the columns of the file do not match.
+    """
+    if not os.path.isdir(cwd):
+        raise FileNotFoundError(f"The specified directory '{cwd}' does not exist.")
 
-  file_path = os.path.join(cwd, filename)
+    file_path = os.path.join(cwd, filename)
 
-  if not os.path.isfile(file_path):
-    raise FileNotFoundError(f"The specified file '{filename}' does not exist in '{cwd}' directory.")
+    if not os.path.isfile(file_path):
+        raise FileNotFoundError(f"The specified file '{filename}' does not exist in '{cwd}' directory.")
 
-  col_1, col_2 = np.loadtxt(file_path, dtype=float, comments='#', delimiter=';', skiprows=1, unpack=True)
+    col_1, col_2 = np.loadtxt(file_path, dtype=float, comments="#", delimiter=";", skiprows=1, unpack=True)
 
-  # sanity check
-  if len(col_1) != len(col_2):
-    raise ValueError(f"The number of entries in columns of file '{filename}' do not match.")
+    # sanity check
+    if len(col_1) != len(col_2):
+        raise ValueError(f"The number of entries in columns of file '{filename}' do not match.")
 
-  return col_1, col_2
-
-
-def plot(time: np.ndarray, amplitude:np.ndarray, freq: np.ndarray, power: np.ndarray) -> None:
-  """
-  Plot the time series and Lomb-Scargle periodogram.
-
-  The plot displays two subplots: the first shows the time series plot of the input data, while the second
-  shows the Lomb-Scargle periodogram plot of the input data. The plot also includes significance levels and
-  labels to help identify periodicities in the data.
+    return col_1, col_2
 
 
-  Parameters
-  ----------
-  time : numpy.ndarray
-    The time values of the signal, in seconds.
-  amplitude : numpy.ndarray
-    The amplitude values of the signal.
-  freq : numpy.ndarray
-    The frequency values obtained from the Lomb-Scargle periodogram analysis, in Hz.
-  power : numpy.ndarray
-    The power values obtained from the Lomb-Scargle periodogram analysis.
+def plot(time: np.ndarray, amplitude: np.ndarray, freq: np.ndarray, power: np.ndarray) -> None:
+    """
+    Plot the time series and Lomb-Scargle periodogram.
 
-  Returns
-  -------
-  None
-  """
-  fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1)
-  fig.canvas.manager.set_window_title('Lomb-Scargle periodogram')
+    The plot displays two subplots: the first shows the time series plot of the input data, while the second
+    shows the Lomb-Scargle periodogram plot of the input data. The plot also includes significance levels and
+    labels to help identify periodicities in the data.
 
-  ax1.set_xlabel(r'time [$s$]')
-  ax1.set_ylabel(r'amplitude [$arb.u.$]')
-  ax2.set_xlabel(r'frequency [$1/s$]')
-  ax2.set_ylabel(r'power [$arb.u.$]')
 
-  ax1.plot(time, amplitude, '.', color='Cornflowerblue')
-  ax2.plot(freq, power, color='Cornflowerblue')
+    Parameters
+    ----------
+    time : numpy.ndarray
+      The time values of the signal, in seconds.
+    amplitude : numpy.ndarray
+      The amplitude values of the signal.
+    freq : numpy.ndarray
+      The frequency values obtained from the Lomb-Scargle periodogram analysis, in Hz.
+    power : numpy.ndarray
+      The power values obtained from the Lomb-Scargle periodogram analysis.
 
-  ax1.set_xlim([time[0]-1, time[-1]+2])
-  ax2.set_xlim([freq[0]-.003, freq[-1]])
+    Returns
+    -------
+    None
+    """
+    fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1)
+    fig.canvas.manager.set_window_title("Lomb-Scargle periodogram")
 
-  # significance levels
-  plt.axhline(14.51, 0, .95, color='Maroon', linewidth=.3)  # p = 0.0001
-  plt.axhline(12.21, 0, .95, color='Maroon', linewidth=.3)  # p = 0.001
-  plt.axhline(09.90, 0, .95, color='Maroon', linewidth=.3)  # p = 0.01
-  plt.axhline(07.55, 0, .95, color='Maroon', linewidth=.3)  # p = 0.1
+    ax1.set_xlabel(r"time [$s$]")
+    ax1.set_ylabel(r"amplitude [$arb.u.$]")
+    ax2.set_xlabel(r"frequency [$1/s$]")
+    ax2.set_ylabel(r"power [$arb.u.$]")
 
-  # significance labels
-  ax2.text(freq[-1]*.96, 14.51, '.0001', size=5)
-  ax2.text(freq[-1]*.96, 12.21, '.001', size=5)
-  ax2.text(freq[-1]*.96,  9.90, '.01', size=5)
-  ax2.text(freq[-1]*.96,  7.55, '.1', size=5)
+    ax1.plot(time, amplitude, ".", color="Cornflowerblue")
+    ax2.plot(freq, power, color="Cornflowerblue")
 
-  plt.tight_layout()
-  plt.show()
+    ax1.set_xlim([time[0] - 1, time[-1] + 2])
+    ax2.set_xlim([freq[0] - 0.003, freq[-1]])
+
+    # significance levels
+    plt.axhline(14.51, 0, 0.95, color="Maroon", linewidth=0.3)  # p = 0.0001
+    plt.axhline(12.21, 0, 0.95, color="Maroon", linewidth=0.3)  # p = 0.001
+    plt.axhline(09.90, 0, 0.95, color="Maroon", linewidth=0.3)  # p = 0.01
+    plt.axhline(07.55, 0, 0.95, color="Maroon", linewidth=0.3)  # p = 0.1
+
+    # significance labels
+    ax2.text(freq[-1] * 0.96, 14.51, ".0001", size=5)
+    ax2.text(freq[-1] * 0.96, 12.21, ".001", size=5)
+    ax2.text(freq[-1] * 0.96, 9.90, ".01", size=5)
+    ax2.text(freq[-1] * 0.96, 7.55, ".1", size=5)
+
+    plt.tight_layout()
+    plt.show()
 
 
 def main() -> None:
-  """
-  Load data and plot the time series and the Lomb-Scargle periodogram.
+    """
+    Load data and plot the time series and the Lomb-Scargle periodogram.
 
-  Loads time series and frequency domain data generated by another script from the files 'data.temp' and 'data.spec'
-  located in the current directory. That data is supposed to contain a non-equidistant timeseries in 'data.temp' and
-  the corresponding Lomb-Scargle periodogram in 'data.spec'.
-  Said data is being ploted in a (2, 1) subplot visualizing the timeseries and the Lomb-Scargle periodogram.
+    Loads time series and frequency domain data generated by another script from the files 'data.temp' and 'data.spec'
+    located in the current directory. That data is supposed to contain a non-equidistant timeseries in 'data.temp' and
+    the corresponding Lomb-Scargle periodogram in 'data.spec'.
+    Said data is being ploted in a (2, 1) subplot visualizing the timeseries and the Lomb-Scargle periodogram.
 
-  Raises
-  ------
-  FileNotFoundError
-    If either 'data.temp' or 'data.spec' file is not found.
-  ValueError
-    If the data in the files cannot be loaded.
+    Raises
+    ------
+    FileNotFoundError
+      If either 'data.temp' or 'data.spec' file is not found.
+    ValueError
+      If the data in the files cannot be loaded.
 
-  Returns
-  -------
-  None
-  """
-  colorama.init(autoreset=True)
-  red = colorama.Fore.RED + colorama.Style.BRIGHT
+    Returns
+    -------
+    None
+    """
+    colorama.init(autoreset=True)
+    red = colorama.Fore.RED + colorama.Style.BRIGHT
 
-  cmd = 'pwd'
-  cwd = subprocess.run(cmd, shell=True, encoding='utf-8', stdout=subprocess.PIPE, check=True).stdout.strip()
+    cmd = "pwd"
+    cwd = subprocess.run(cmd, shell=True, encoding="utf-8", stdout=subprocess.PIPE, check=True).stdout.strip()
 
-  # Load data from 'data.temp' and 'data.spec' files
-  try:
-    time, amplitude = read_file(cwd, 'data.temp')
-    freq, power = read_file(cwd, 'data.spec')
-  except FileNotFoundError as e:
-    print(red + str(e))
-    return
-  except ValueError as e:
-    print(red + str(e))
-    return
+    # Load data from 'data.temp' and 'data.spec' files
+    try:
+        time, amplitude = read_file(cwd, "data.temp")
+        freq, power = read_file(cwd, "data.spec")
+    except FileNotFoundError as e:
+        print(red + str(e))
+        return
+    except ValueError as e:
+        print(red + str(e))
+        return
 
-  # Plot the time series and the Lomb-Scargle periodogram
-  plot(time, amplitude, freq, power)
+    # Plot the time series and the Lomb-Scargle periodogram
+    plot(time, amplitude, freq, power)
 
 
-if __name__ == '__main__':
-  main()
+if __name__ == "__main__":
+    main()
